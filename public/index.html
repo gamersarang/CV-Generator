@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS-Friendly CV & Cover Letter Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Tab styling */
+        .tab-active {
+            border-color: #4f46e5; /* indigo-600 */
+            color: #4f46e5;
+        }
+        .tab-inactive {
+             border-color: transparent;
+             color: #6b7280; /* gray-500 */
+        }
+         .tab-inactive:hover {
+            border-color: #d1d5db; /* gray-300 */
+            color: #374151; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">ATS-Friendly CV & Cover Letter Generator</h1>
+            <p class="text-md text-gray-600 mt-2">Create tailored documents to get past applicant tracking systems.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Column 1: Inputs -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">1. Your Details & Job Info</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="fullName" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Jane Doe">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., jane.doe@example.com">
+                    </div>
+                     <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" id="phone" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., +44 7700 900000">
+                    </div>
+                     <div>
+                        <label for="linkedin" class="block text-sm font-medium text-gray-700">LinkedIn Profile URL</label>
+                        <input type="url" id="linkedin" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., linkedin.com/in/janedoe">
+                    </div>
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700">Target Country</label>
+                        <input type="text" id="country" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., United Kingdom, USA">
+                    </div>
+                    <div>
+                        <label for="jobDescription" class="block text-sm font-medium text-gray-700">Paste Job Description Here</label>
+                        <textarea id="jobDescription" rows="10" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Paste the full job description text..."></textarea>
+                    </div>
+                     <div>
+                        <label for="yourInfo" class="block text-sm font-medium text-gray-700">Your Experience & Education</label>
+                        <textarea id="yourInfo" rows="10" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Briefly describe your work history, projects, and education. The AI will use this as a base."></textarea>
+                    </div>
+                    <button id="generateBtn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 flex items-center justify-center">
+                        <span id="btn-text">Generate CV & Cover Letter</span>
+                        <div id="loader" class="loader hidden ml-3"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Column 2: Analysis & Recommendations -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">2. ATS Analysis & Recommendations</h2>
+                 <div id="analysis-output" class="space-y-6 mt-4 h-[83vh] overflow-y-auto pr-2">
+                    <p class="text-gray-500">Analysis of the job description will appear here...</p>
+                </div>
+            </div>
+
+            <!-- Column 3: Generated Output -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button id="tab-cv" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm tab-active">CV</button>
+                        <button id="tab-cover-letter" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm tab-inactive">Cover Letter</button>
+                    </nav>
+                </div>
+                
+                <!-- CV Content -->
+                <div id="cv-content" class="mt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Generated CV</h2>
+                        <button id="copyBtn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200">Copy</button>
+                    </div>
+                    <div id="cv-output" class="prose prose-sm max-w-none h-[75vh] overflow-y-auto pr-2 whitespace-pre-wrap"><p class="text-gray-500">Your generated CV will appear here.</p></div>
+                </div>
+
+                <!-- Cover Letter Content (hidden by default) -->
+                <div id="cover-letter-content" class="hidden mt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Generated Cover Letter</h2>
+                        <button id="downloadCoverLetterBtn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Download (.txt)</button>
+                    </div>
+                    <div id="cover-letter-output" class="prose prose-sm max-w-none h-[75vh] overflow-y-auto pr-2 whitespace-pre-wrap"><p class="text-gray-500">Your generated cover letter will appear here.</p></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+
+    <script type="module">
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btn-text');
+        const loader = document.getElementById('loader');
+        const analysisOutput = document.getElementById('analysis-output');
+        const cvOutput = document.getElementById('cv-output');
+        const coverLetterOutput = document.getElementById('cover-letter-output');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadCoverLetterBtn = document.getElementById('downloadCoverLetterBtn');
+        const toast = document.getElementById('toast');
+
+        const tabCv = document.getElementById('tab-cv');
+        const tabCoverLetter = document.getElementById('tab-cover-letter');
+        const cvContent = document.getElementById('cv-content');
+        const coverLetterContent = document.getElementById('cover-letter-content');
+
+        // Event Listeners
+        generateBtn.addEventListener('click', handleGenerate);
+        copyBtn.addEventListener('click', copyCvToClipboard);
+        downloadCoverLetterBtn.addEventListener('click', downloadCoverLetter);
+        tabCv.addEventListener('click', () => switchTab('cv'));
+        tabCoverLetter.addEventListener('click', () => switchTab('cover-letter'));
+        
+        function switchTab(tab) {
+            if (tab === 'cv') {
+                cvContent.classList.remove('hidden');
+                coverLetterContent.classList.add('hidden');
+                tabCv.classList.add('tab-active');
+                tabCv.classList.remove('tab-inactive');
+                tabCoverLetter.classList.add('tab-inactive');
+                tabCoverLetter.classList.remove('tab-active');
+            } else {
+                cvContent.classList.add('hidden');
+                coverLetterContent.classList.remove('hidden');
+                tabCoverLetter.classList.add('tab-active');
+                tabCoverLetter.classList.remove('tab-inactive');
+                tabCv.classList.add('tab-inactive');
+                tabCv.classList.remove('tab-active');
+            }
+        }
+
+        async function handleGenerate() {
+            // --- Get all inputs ---
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const linkedin = document.getElementById('linkedin').value.trim();
+            const country = document.getElementById('country').value.trim();
+            const jobDescription = document.getElementById('jobDescription').value.trim();
+            const yourInfo = document.getElementById('yourInfo').value.trim();
+
+            // --- Basic Validation ---
+            if (!jobDescription || !yourInfo || !fullName || !email) {
+                alert('Please fill out your name, email, background, and the job description.');
+                return;
+            }
+
+            // --- UI state for loading ---
+            setLoading(true);
+            analysisOutput.innerHTML = '<p class="text-gray-500">Analyzing job description and generating content...</p>';
+            cvOutput.innerHTML = '<p class="text-gray-500">Building your tailored CV...</p>';
+            coverLetterOutput.innerHTML = '<p class="text-gray-500">Drafting your cover letter...</p>';
+            
+            // --- Construct the prompt for the AI ---
+            const prompt = `
+                Act as an expert career coach and professional CV writer specializing in creating ATS-friendly application materials.
+                
+                My details:
+                - Name: ${fullName}
+                - Email: ${email}
+                - Phone: ${phone}
+                - LinkedIn: ${linkedin}
+
+                My background (experience, skills, education):
+                <my_background>${yourInfo}</my_background>
+
+                Target country: ${country || 'Not specified'}. Tailor formats accordingly.
+
+                Target job description:
+                <job_description>${jobDescription}</job_description>
+
+                Perform the following tasks and return ONLY a single JSON object.
+                
+                1.  **Analyze Job Description**: Identify the top 15-20 critical keywords and skills.
+                2.  **Generate Recommendations**: Provide actionable advice to improve my chances, referencing the job description.
+                3.  **List Target Skills**: Create a bulleted list of essential skills for the CV's "Skills" section.
+                4.  **Generate Complete CV**: Write a full, professional, ATS-friendly CV in plain text. Weave in keywords naturally. Use my background as a foundation. Sections: Contact Info, Professional Summary, Skills, Work Experience, Education.
+                5.  **Generate Cover Letter**: Write a professional, persuasive cover letter. Address it to the "Hiring Manager". It must reference my background and specifically address requirements in the job description to show I am a strong fit.
+            `;
+
+            try {
+                // --- Call the Gemini API ---
+                const result = await callGeminiAPI(prompt);
+                
+                // --- Parse and render the result ---
+                const parsedResult = JSON.parse(result);
+                renderResults(parsedResult);
+
+            } catch (error) {
+                console.error("Error during generation:", error);
+                analysisOutput.innerHTML = `<p class="text-red-500">An error occurred. Please check the console for details and try again.</p>`;
+                cvOutput.innerHTML = `<p class="text-red-500">Failed to generate CV.</p>`;
+                coverLetterOutput.innerHTML = `<p class="text-red-500">Failed to generate Cover Letter.</p>`;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateBtn.disabled = true;
+                btnText.classList.add('hidden');
+                loader.classList.remove('hidden');
+            } else {
+                generateBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                loader.classList.add('hidden');
+            }
+        }
+
+        async function callGeminiAPI(prompt) {
+            const apiKey = ""; // Leave blank, handled by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "keywords": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "recommendations": { "type": "STRING" },
+                            "skills_to_include": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "generated_cv_text": { "type": "STRING" },
+                            "generated_cover_letter_text": { "type": "STRING" }
+                        },
+                        required: ["keywords", "recommendations", "skills_to_include", "generated_cv_text", "generated_cover_letter_text"]
+                    }
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`API call failed with status: ${response.status}. Body: ${errorBody}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                if (result.promptFeedback && result.promptFeedback.blockReason) {
+                   throw new Error(`Request was blocked: ${result.promptFeedback.blockReason}. Please adjust your input.`);
+                }
+                throw new Error("Invalid or empty response from API.");
+            }
+        }
+        
+        function renderResults(data) {
+            // --- Render Analysis Column ---
+            analysisOutput.innerHTML = `
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-indigo-700 mb-2">Overall Recommendations</h3>
+                    <p class="text-gray-600">${data.recommendations.replace(/\\n/g, '<br>')}</p>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-indigo-700 mb-2">Top Keywords from Job Description</h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${data.keywords.map(kw => `<span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full">${kw}</span>`).join('')}
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-lg font-semibold text-indigo-700 mb-2">Suggested Skills to Feature</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                         ${data.skills_to_include.map(skill => `<li>${skill}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            // --- Render CV and Cover Letter ---
+            cvOutput.innerText = data.generated_cv_text;
+            coverLetterOutput.innerText = data.generated_cover_letter_text;
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.className = "toast show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function copyCvToClipboard() {
+            const cvText = cvOutput.innerText;
+            if (!cvText || cvText.includes("Your generated CV will appear here.")) return;
+            navigator.clipboard.writeText(cvText).then(() => showToast('CV copied to clipboard!'))
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                showToast('Failed to copy. Please copy manually.');
+            });
+        }
+        
+        function downloadCoverLetter() {
+            const letterText = coverLetterOutput.innerText;
+            if (!letterText || letterText.includes("Your generated cover letter will appear here.")) return;
+            
+            const blob = new Blob([letterText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const fullName = document.getElementById('fullName').value.trim() || 'user';
+            link.download = `${fullName.replace(/ /g, '_')}_Cover_Letter.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>
