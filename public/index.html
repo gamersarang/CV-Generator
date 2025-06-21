@@ -285,26 +285,21 @@
         }
 
         async function callGeminiAPI(prompt) {
-            const apiKey = ""; // Leave blank, handled by the environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+    });
 
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            "keywords": { "type": "ARRAY", "items": { "type": "STRING" } },
-                            "recommendations": { "type": "STRING" },
-                            "skills_to_include": { "type": "ARRAY", "items": { "type": "STRING" } },
-                            "generated_cv_text": { "type": "STRING" },
-                            "generated_cover_letter_text": { "type": "STRING" }
-                        },
-                        required: ["keywords", "recommendations", "skills_to_include", "generated_cv_text", "generated_cover_letter_text"]
-                    }
-                }
-            };
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `API call failed with status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    // The actual JSON string is nested inside the 'result' property
+    return result.result;
+}
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
